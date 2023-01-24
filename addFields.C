@@ -83,7 +83,7 @@ bool setCellFieldType
     // Check field exists
     if (fieldHeader.headerOk())
     {
-        Info<< "    Setting internal values of "
+        Info<< "    Adding internal values of "
             << fieldHeader.headerClassName()
             << " " << fieldName << endl;
 
@@ -91,16 +91,9 @@ bool setCellFieldType
 
         const Type value = pTraits<Type>(fieldValueStream);
 
-        if (selectedCells.size() == field.size())
+        forAll(selectedCells, celli)
         {
-            field.primitiveFieldRef() = value;
-        }
-        else
-        {
-            forAll(selectedCells, celli)
-            {
-                field[selectedCells[celli]] = value;
-            }
+            field[selectedCells[celli]] += value;
         }
 
         typename GeometricField<Type, fvPatchField, volMesh>::
@@ -229,7 +222,7 @@ bool setFaceFieldType
     // Check field exists
     if (fieldHeader.headerOk())
     {
-        Info<< "    Setting patchField values of "
+        Info<< "    Adding patchField values of "
             << fieldHeader.headerClassName()
             << " " << fieldName << endl;
 
@@ -412,22 +405,22 @@ int main(int argc, char *argv[])
     #include "createTime.H"
     #include "createNamedMesh.H"
 
-    const dictionary setFieldsDict(systemDict("setFieldsDict", args, mesh));
+    const dictionary addFieldsDict(systemDict("addFieldsDict", args, mesh));
 
-    if (setFieldsDict.found("defaultFieldValues"))
+    if (addFieldsDict.found("defaultFieldValues"))
     {
-        Info<< "Setting field default values" << endl;
+        Info<< "Adding field default values" << endl;
         PtrList<setCellField> defaultFieldValues
         (
-            setFieldsDict.lookup("defaultFieldValues"),
+            addFieldsDict.lookup("defaultFieldValues"),
             setCellField::iNew(mesh, labelList(mesh.nCells()))
         );
         Info<< endl;
     }
 
-    Info<< "Setting field region values" << endl;
+    Info<< "Adding field region values" << endl;
 
-    PtrList<entry> regions(setFieldsDict.lookup("regions"));
+    PtrList<entry> regions(addFieldsDict.lookup("regions"));
 
     forAll(regions, regionI)
     {
