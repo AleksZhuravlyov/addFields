@@ -1,0 +1,6 @@
+darwin64ClangDPInt32Opt
+.idea
+tmp
+cmake-build-release
+cmake-build-debug
+build
